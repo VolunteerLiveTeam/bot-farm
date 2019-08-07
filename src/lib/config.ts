@@ -124,4 +124,11 @@ export class Config {
     });
     return rez;
   }
+
+  public for(id: string) {
+    return {
+      get: (key: string) => this.get(id + "." + key),
+      getObject: (key: string) => this.getObject(id + "." + key)
+    };
+  }
 }

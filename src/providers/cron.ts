@@ -1,13 +1,29 @@
-import { CronJob} from "cron";
+import { CronJob } from "cron";
 import { Injectable } from "../injector";
+import Farmer from "./farmer";
+import Multimap from "../lib/multimap";
+
+interface Cron {
+  schedule(spec: string, cb: () => void): void;
+}
 
 @Injectable()
 export default class CronProvider {
-    constructor() {}
+  constructor(private farmer: Farmer) {
+    farmer.on("shutdown", () => {
+      this.jobs.forEach(job => job.stop());
+    });
+  }
 
-    private jobs: CronJob[] = [];
+  private jobs: Multimap<string, CronJob> = new Multimap();
 
-    public schedule(sched: string, func: () => void) {
-        this.jobs.push(new CronJob(sched, func, () => {}, true));
-    }
+  public for(id: string) {
+    return {
+      schedule: (spec, cb) => {
+        const job = new CronJob(spec, cb);
+        this.jobs.add(id, job);
+        job.start();
+      }
+    } as Cron;
+  }
 }

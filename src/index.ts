@@ -4,6 +4,7 @@ import { addFarmConfig } from "./farmConfig";
 import { Bot, BotContext } from "./interface";
 import { Injector, Type } from "./injector";
 import { Brain, InMemoryBrain } from "./providers/brain";
+import Farmer from "./providers/farmer";
 
 async function discover() {
   const folders = await fs.readdir(__dirname + "/bots/", { encoding: "utf-8" });
@@ -23,6 +24,7 @@ const BOTS: Bot[] = [];
 async function bootstrap() {
   const injector = new Injector();
 
+  const farmer = injector.resolve(Farmer);
   let conf = new ConfigBuilder();
   conf = addFarmConfig(conf);
 
@@ -45,11 +47,17 @@ async function bootstrap() {
   for (const botType of bots) {
     botType(context);
   }
+
+  return injector;
 }
 
 bootstrap()
-  .then(() => {
+  .then(injector => {
     console.log("Bot Farm bootstrapped.");
+    process.on("exit", () => {
+      console.log("Sending shutdown event...");
+      injector.get(Farmer).emit("shutdown");
+    });
   })
   .catch(e => {
     console.error("REJECTED");

@@ -9,24 +9,26 @@ import ModmailConversation, {
 } from "snoowrap/dist/objects/ModmailConversation";
 import { ChatPostMessageArguments } from "@slack/web-api";
 
+const ID = "modmail-slack";
+
 export default createBot(
   {
-    id: "modmail-slack",
+    id: ID,
     configParameters: cb =>
-      cb.for("modmail-slack", c =>
+      cb.for(ID, c =>
         c
           .env("cron-interval", "MODMAIL_CRON_INTERVAL", "0 * * * * *")
           .env("channel", "MODMAIL_SLACK_CHANNEL", "auto-modmail")
       )
   },
   function(ctx: BotContext) {
-    const config = ctx.require(Config);
-    const cron = ctx.require(CronProvider);
+    const config = ctx.require(Config).for(ID);
+    const cron = ctx.require(CronProvider).for(ID);
     const { r } = ctx.require(RedditProvider);
     const { api: slack } = ctx.require(SlackWebProvider);
-    const brain = ctx.require(Brain).create("modmail-slack");
+    const brain = ctx.require(Brain).create(ID);
 
-    cron.schedule(config.get("modmail-slack.cron-interval"), async () => {
+    cron.schedule(config.get("cron-interval"), async () => {
       const convos = await r
         .getSubreddit("VolunteerLiveTeam")
         .getNewModmailConversations();
@@ -58,7 +60,7 @@ export default createBot(
         )
       );
       const slackPayload: ChatPostMessageArguments = {
-        channel: config.get("modmail-slack.channel"),
+        channel: config.get("channel"),
         text: "New modmail!"
       };
       slackPayload.attachments = convMsgs.map(({ conversation, messages }) => {
@@ -97,6 +99,11 @@ export default createBot(
         };
       });
       await slack.chat.postMessage(slackPayload);
+      const latestConvo = convos.sort(
+        (a, b) =>
+          new Date(b.lastUpdated).valueOf() - new Date(a.lastUpdated).valueOf()
+      )[0];
+      brain.set("modmail.lastTime", latestConvo.lastUpdated.toString());
     });
   }
 );

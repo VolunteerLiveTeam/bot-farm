@@ -24,6 +24,7 @@
     "glob": "^7.1.4",
     "lodash": "^4.17.15",
     "reflect-metadata": "^0.1.13",
-    "snoowrap": "^1.18.0"
+    "snoowrap": "^1.18.0",
+    "strict-event-emitter-types": "^2.0.0"
   }
 }
