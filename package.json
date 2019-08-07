@@ -1,0 +1,29 @@
+{
+  "name": "bot-farm",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/index.ts"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@slack/web-api": "^5.1.0",
+    "@types/cron": "^1.7.1",
+    "@types/dotenv": "^6.1.1",
+    "@types/glob": "^7.1.1",
+    "@types/lodash": "^4.14.136",
+    "@types/node": "^12.6.8",
+    "cron": "^1.7.1",
+    "dotenv": "^8.0.0",
+    "glob": "^7.1.4",
+    "lodash": "^4.17.15",
+    "reflect-metadata": "^0.1.13",
+    "snoowrap": "^1.18.0"
+  }
+}
