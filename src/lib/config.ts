@@ -104,6 +104,12 @@ export class Config {
 
   public get(key: string): string {
     const field = get(this._data, key);
+    if (typeof field === "undefined") {
+      console.log(this._data);
+      throw new Error(
+        `Tried to access a config field that doesn't exist (${key})`
+      );
+    }
     if (!(field instanceof ConfigSource)) {
       throw new Error(
         `Tried to access nested config object as if it was a key (${key})`

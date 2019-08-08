@@ -10,4 +10,5 @@ export const addFarmConfig = (cfg: ConfigBuilder) =>
         .secret("username", "REDDIT_USERNAME")
         .secret("password", "REDDIT_PASSWORD")
     )
-    .for("slack", c => c.secret("token", "SLACK_TOKEN"));
+    .for("slack", c => c.secret("token", "SLACK_TOKEN"))
+    .for("discord", c => c.secret("token", "DISCORD_TOKEN"));

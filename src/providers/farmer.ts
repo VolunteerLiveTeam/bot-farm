@@ -14,4 +14,13 @@ export default class Farmer extends (EventEmitter as { new (): Emitter }) {
   constructor() {
     super();
   }
+
+  onShutdown(id: string, cb: () => void) {
+    this.on("shutdown", cb);
+    this.on("botReload", evtId => {
+      if (id === evtId) {
+        cb();
+      }
+    });
+  }
 }
