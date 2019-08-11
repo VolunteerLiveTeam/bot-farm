@@ -7,8 +7,7 @@ export const addFarmConfig = (cfg: ConfigBuilder) =>
         .env("userAgent", "REDDIT_USER_AGENT")
         .env("clientId", "REDDIT_CLIENT_ID")
         .secret("clientSecret", "REDDIT_CLIENT_SECRET")
-        .secret("username", "REDDIT_USERNAME")
-        .secret("password", "REDDIT_PASSWORD")
+        .secret("refreshToken", "REDDIT_REFRESH_TOKEN")
     )
     .for("slack", c => c.secret("token", "SLACK_TOKEN"))
     .for("discord", c => c.secret("token", "DISCORD_TOKEN"));
