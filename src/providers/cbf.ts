@@ -75,7 +75,7 @@ interface ICBFContext {
     callback: (m: CBFMessage) => void | Promise<void>
   ): void;
 
-  respond(
+  command(
     what: string | RegExp,
     callback: (m: CBFMessage) => void | Promise<void>
   ): void;
@@ -197,14 +197,14 @@ export default class CBF {
           brain = new (class extends EventEmitter
             implements Hubot.Brain<undefined> {
             set(key: string, value: any) {
-              brain.set(key, JSON.stringify(value));
+              brain.set("hubot/" + key, JSON.stringify(value));
               return this;
             }
             get(key: string) {
-              return JSON.parse(brain.get(key) || "");
+              return JSON.parse(brain.get("hubot/" + key) || "");
             }
             remove(key: string) {
-              brain.remove(key);
+              brain.remove("hubot/" + key);
               return this;
             }
             save() {}
@@ -214,7 +214,7 @@ export default class CBF {
             mergeData(data: any) {
               const payload: { [K: string]: string } = {};
               Object.keys(data).forEach(key => {
-                payload[key] = JSON.stringify(data[key]);
+                payload["hubot/" + key] = JSON.stringify(data["hubot/" + key]);
               });
               brain.merge(payload);
             }
@@ -292,7 +292,7 @@ export default class CBF {
         }
         listenFor(wat, cb);
       },
-      respond: (wat, cb) => {
+      command: (wat, cb) => {
         let ex: RegExp;
         if (wat instanceof RegExp) {
           ex = wat;
@@ -305,10 +305,10 @@ export default class CBF {
             let prefix;
             switch (type) {
               case "prefix":
-                prefix = escapeRe(opts.options.slack!.prefix!);
+                prefix = "^" + escapeRe(opts.options.slack!.prefix!);
                 break;
               case "mention":
-                prefix = `<@${opts.slack!.self.id}>\\s`;
+                prefix = `^<@${opts.slack!.self.id}>\\s`;
                 break;
             }
             listenFor(new RegExp(prefix + ex.source, "i"), cb);
